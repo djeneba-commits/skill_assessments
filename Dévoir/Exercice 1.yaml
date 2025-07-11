@@ -1,0 +1,26 @@
+
+- name: Configuration du switch Cisco
+  hosts: switches
+  gather_facts: no
+  vars_files:
+    - Exercice.yaml
+
+  tasks:
+    - name: Créer et activer le VLAN de gestion
+      cisco.ios.ios_vlan:
+        vlan_id: "{{ vlan.id | default(10) }}"
+        name: "{{ vlan.name }}"
+        state: "{{ vlan.state }}"
+
+    - name: Configurer l'interface VLAN
+      cisco.ios.ios_interface:
+        name: "Vlan{{ interface_vlan.vlan_id }}"
+        ipv4: "{{ interface_vlan.ip_address }}"
+        ipv4_mask: "{{ interface_vlan.subnet_mask }}"
+        enabled: true
+
+    - name: Configurer l'interface trunk
+      cisco.ios.ios_interface:
+        name: "{{ trunk_interface.name }}"
+        mode: "{{ trunk_interface.mode }}"
+        trunk_allowed_vlans: "{{ trunk_interface.allowed_vlans }}"
